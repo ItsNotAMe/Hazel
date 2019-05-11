@@ -64,18 +64,21 @@ project "Hazel"
 
 		filter "configurations:Debug"
 			defines "HZ_DEBUG"
+			buildoptions "/MDd"
 			symbols "On"
 			defines
 			{
 				"HZ_ENABLE_ASSERTS"
 			}
 
-		filter "configurations:Debug"
+		filter "configurations:Release"
 			defines "HZ_RELEASE"
+			buildoptions "/MD"
 			optimize "On"
 
-		filter "configurations:Debug"
+		filter "configurations:Dist"
 			defines "HZ_DIST"
+			buildoptions "/MD"
 			optimize "On"
 
 project "Sandbox"
@@ -115,16 +118,19 @@ project "Sandbox"
 
 		filter "configurations:Debug"
 			defines "HZ_DEBUG"
+			buildoptions "/MDd"
 			symbols "On"
 			defines
 			{
 				"HZ_ENABLE_ASSERTS"
 			}
 
-		filter "configurations:Debug"
+		filter "configurations:Release"
 			defines "HZ_RELEASE"
+			buildoptions "/MD"
 			optimize "On"
 
-		filter "configurations:Debug"
+		filter "configurations:Dist"
 			defines "HZ_DIST"
+			buildoptions "/MD"
 			optimize "On"
