@@ -67,12 +67,10 @@ namespace Hazel {
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-		HZ_CORE_INFO("ImGui new frame");
 	}
 
 	void ImGuiLayer::End()
 	{
-		HZ_CORE_INFO("ImGui end");
 		ImGuiIO& io = ImGui::GetIO();
 		Application& app = Application::Get();
 		io.DisplaySize = ImVec2((float)app.GetWindow().GetWidth(), (float)app.GetWindow().GetHeight());
