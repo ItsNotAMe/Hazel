@@ -6,6 +6,7 @@
 #include "Hazel/Events/KeyEvent.h"
 
 #include "Platform/OpenGL/OpenGLContext.h"
+#include "Hazel/Renderer/RenderCommand.h"
 
 namespace Hazel {
 
@@ -62,6 +63,7 @@ namespace Hazel {
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			data.Width = width;
 			data.Height = height;
+			//RenderCommand::ResizeViewport(width, height);
 
 			WindowResizeEvent event(width, height);
 			data.EventCallback(event);
