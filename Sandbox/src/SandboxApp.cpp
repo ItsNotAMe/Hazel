@@ -1,10 +1,11 @@
 #include <Hazel.h>
-
-#include <Platform/OpenGL/OpenGLShader.h>
+#include <Hazel/Core/EntryPoint.h>
 
 #include <imgui/imgui.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+#include "Sandbox2D.h"
 
 class ExampleLayer : public Hazel::Layer
 {
@@ -70,14 +71,18 @@ public:
 		auto textureShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
 		//m_TextureShader = Hazel::Shader::Create("assets/shaders/Texture.glsl");
 
-		m_ShaderLibrary.Load("Color", "assets/shaders/FlatColor.glsl");
+		{
+			auto colorShader = m_ShaderLibrary.Load("Color", "assets/shaders/FlatColor.glsl");
+		}
 		//m_FlatColorShader = Hazel::Shader::Create("assets/shaders/FlatColor.glsl");
 
 		m_ThinkTexture = Hazel::Texture2D::Create("assets/textures/thinking_smol.png");
 		m_DuckTexture = Hazel::Texture2D::Create("assets/textures/cat.png");
 
 		textureShader->Bind();
-		std::dynamic_pointer_cast<Hazel::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
+		textureShader->SetInt("u_Texture", 0);
+		textureShader->SetFloat4("u_Color", { 1.0f, 1.0f, 1.0f, 1.0f });
+		textureShader->SetFloat("u_RepeatCount", 1.0f);
 	}
 
 	void OnUpdate(Hazel::Timestep ts) override
@@ -100,12 +105,12 @@ public:
 			for (int x = 0; x < 3; x++) {
 				glm::vec3 pos(x * 0.68f - 0.68f - 2 / 3, y * 0.68f - 0.68f - 2 / 3, 0.0f);
 				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * rotate * scale;
-				glm::vec3 color(0.0f);
+				glm::vec4 color(0.0f);
 				if ((x + y) % 2 == 0)
-					color = m_Color1;
+					color = glm::vec4(m_Color1, 1.0f);
 				else
-					color = m_Color2;
-				std::dynamic_pointer_cast<Hazel::OpenGLShader>(colorShader)->UploadUniformFloat3("u_Color", color);
+					color = glm::vec4(m_Color2, 1.0f);
+				colorShader->SetFloat4("u_Color", color);
 				Hazel::Renderer::Submit(colorShader, m_SquareVA, transform);
 			}
 		}
@@ -152,7 +157,8 @@ class Sandbox : public Hazel::Application
 public:
 	Sandbox()
 	{
-		PushLayer(new ExampleLayer());
+		//PushLayer(new ExampleLayer());
+		PushLayer(new Sandbox2D());
 	}
 
 	~Sandbox()

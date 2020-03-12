@@ -2,6 +2,8 @@
 
 // For Hazel applications
 
+#include "Hazel/Core/Core.h"
+
 #include "Hazel/Core/Application.h"
 #include "Hazel/Core/Layer.h"
 #include "Hazel/Core/Log.h"
@@ -16,6 +18,8 @@
 
 // Renderer ------------------------------------
 #include "Hazel/Renderer/Renderer.h"
+#include "Hazel/Renderer/Renderer2D.h"
+#include "Hazel/Renderer/RenderCommand.h"
 
 #include "Hazel/Renderer/Buffer.h"
 #include "Hazel/Renderer/Shader.h"
@@ -23,8 +27,4 @@
 #include "Hazel/Renderer/VertexArray.h"
 
 #include "Hazel/OrthographicCameraController.h"
-// ---------------------------------------------
-
-// Entry Point ---------------------------------
-#include "Hazel/Core/EntryPoint.h"
 // ---------------------------------------------

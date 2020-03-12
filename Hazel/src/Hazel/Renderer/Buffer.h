@@ -33,10 +33,10 @@ namespace Hazel {
 		std::string Name;
 		ShaderDataType Type;
 		uint32_t Size;
-		uint32_t Offset;
+		size_t Offset;
 		bool Normalized;
 
-		//BufferElement() {}
+		BufferElement() = default;
 
 		BufferElement(ShaderDataType type, const std::string& name, bool normalized = 0)
 			: Name(name), Type(type), Size(ShaderDataTypeSize(type)), Offset(0), Normalized(normalized)
@@ -76,7 +76,7 @@ namespace Hazel {
 			CalculateOffsetsAndStride();
 		}
 
-		inline uint32_t GetStride() const { return m_Stride; }
+		inline size_t GetStride() const { return m_Stride; }
 		inline const std::vector<BufferElement>& GetElements() const { return m_Elements; }
 
 		std::vector<BufferElement>::iterator begin() { return m_Elements.begin(); }
@@ -86,7 +86,7 @@ namespace Hazel {
 	private:
 		void CalculateOffsetsAndStride()
 		{
-			uint32_t offset = 0;
+			size_t  offset = 0;
 			for (auto& element : m_Elements)
 			{
 				element.Offset = offset;
@@ -96,7 +96,7 @@ namespace Hazel {
 		}
 	private:
 		std::vector<BufferElement> m_Elements;
-		uint32_t m_Stride = 0;
+		size_t m_Stride = 0;
 	};
 
 	class VertexBuffer
