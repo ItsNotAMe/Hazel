@@ -4,12 +4,12 @@
 
 #include "Window.h"
 #include "LayerStack.h"
-#include "Events/Event.h"
-#include "Events/ApplicationEvent.h"
+#include "Hazel/Events/Event.h"
+#include "Hazel/Events/ApplicationEvent.h"
 
 #include "Hazel/Core/Timestep.h"
 
-#include "ImGui/ImGuiLayer.h"
+#include "Hazel/ImGui/ImGuiLayer.h"
 
 namespace Hazel {
 
@@ -31,10 +31,12 @@ namespace Hazel {
 		inline static Application& Get() { return *s_Instance; }
 	private:
 		bool OnWindowClosed(WindowCloseEvent& e);
+		bool OnWindowResize(WindowResizeEvent& e);
 	private:
 		Scope<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
+		bool m_Minimized = false;
 		LayerStack m_LayerStack;
 		float m_LastFrameTime = 0;
 	private:

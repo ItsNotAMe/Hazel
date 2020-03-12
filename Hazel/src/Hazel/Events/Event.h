@@ -1,7 +1,7 @@
 #pragma once
 
 #include "hzpch.h"
-#include "Hazel/Core.h"
+#include "Hazel/Core/Core.h"
 
 namespace Hazel {
 
@@ -19,7 +19,7 @@ namespace Hazel {
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
 	};
 
-	enum EventCategory
+	enum class EventCategory
 	{
 		None = 0,
 		EventCategoryApplication	 = BIT(0),
@@ -28,6 +28,8 @@ namespace Hazel {
 		EventCategoryMouse			 = BIT(3),
 		EventCategoryMouseButton	 = BIT(4)
 	};
+
+#define TOINT (int)EventCategory
 
 #define EVENT_CLASS_TYPE(type) static EventType GetStaticType() { return EventType::##type; }\
 								virtual EventType GetEventType() const override { return GetStaticType(); }\
@@ -48,7 +50,7 @@ namespace Hazel {
 
 		inline bool IsInCategory(EventCategory category)
 		{
-			return GetCategoryFlags() & category;
+			return GetCategoryFlags() & (int)category;
 		}
 	};
 

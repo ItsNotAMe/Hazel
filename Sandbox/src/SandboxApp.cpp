@@ -10,7 +10,7 @@ class ExampleLayer : public Hazel::Layer
 {
 public:
 	ExampleLayer()
-		: Layer("Example"), m_Camera(-3.2f, 3.2f, -1.8f, 1.8f)
+		: Layer("Example"), m_CameraController(1280.0f / 720.0f, true)
 	{
 		m_TextureVA = Hazel::VertexArray::Create();
 
@@ -67,43 +67,35 @@ public:
 		m_SquareVA->SetIndexBuffer(squareIB);
 
 
-		m_TextureShader = Hazel::Shader::Create("assets/shaders/Texture.glsl");
+		auto textureShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
+		//m_TextureShader = Hazel::Shader::Create("assets/shaders/Texture.glsl");
 
-		m_FlatColorShader = Hazel::Shader::Create("assets/shaders/FlatColor.glsl");
+		m_ShaderLibrary.Load("Color", "assets/shaders/FlatColor.glsl");
+		//m_FlatColorShader = Hazel::Shader::Create("assets/shaders/FlatColor.glsl");
 
-		m_Texture = Hazel::Texture2D::Create("assets/textures/thinking_smol.png");
+		m_ThinkTexture = Hazel::Texture2D::Create("assets/textures/thinking_smol.png");
+		m_DuckTexture = Hazel::Texture2D::Create("assets/textures/cat.png");
 
-		m_TextureShader->Bind();
-		std::dynamic_pointer_cast<Hazel::OpenGLShader>(m_TextureShader)->UploadUniformInt("u_Texture", 0);
+		textureShader->Bind();
+		std::dynamic_pointer_cast<Hazel::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
 	}
 
 	void OnUpdate(Hazel::Timestep ts) override
 	{
+		// Update
+		m_CameraController.OnUpdate(ts);
+
+		// Render
 		Hazel::RenderCommand::SetClearColor({ 0.15f, 0.15f, 0.15f, 1.0f });
 		Hazel::RenderCommand::Clear();
 
-		float time = ts;
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_W))
-			y += 4 * time;
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_S))
-			y -= 4 * time;
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_A))
-			x -= 4 * time;
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_D))
-			x += 4 * time;
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_Q))
-			rotation += 90 * time;
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_E))
-			rotation -= 90 * time;
-		m_Camera.SetPosition({ x, y, 0.0f });
-		m_Camera.SetRotation(rotation);
-
-		Hazel::Renderer::BeginScene(m_Camera);
+		Hazel::Renderer::BeginScene(m_CameraController.GetCamera());
 
 		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f / 3));
 		glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), glm::vec3(0, 0, 1));
 
-		m_FlatColorShader->Bind();
+		auto colorShader = m_ShaderLibrary.Get("Color");
+		colorShader->Bind();
 		for (int y = 0; y < 3; y++) {
 			for (int x = 0; x < 3; x++) {
 				glm::vec3 pos(x * 0.68f - 0.68f - 2 / 3, y * 0.68f - 0.68f - 2 / 3, 0.0f);
@@ -113,14 +105,15 @@ public:
 					color = m_Color1;
 				else
 					color = m_Color2;
-				std::dynamic_pointer_cast<Hazel::OpenGLShader>(m_FlatColorShader)->UploadUniformFloat3("u_Color", color);
-				Hazel::Renderer::Submit(m_FlatColorShader, m_SquareVA, transform);
+				std::dynamic_pointer_cast<Hazel::OpenGLShader>(colorShader)->UploadUniformFloat3("u_Color", color);
+				Hazel::Renderer::Submit(colorShader, m_SquareVA, transform);
 			}
 		}
 
-		m_Texture->Bind();
-		rotate = glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1));
-		Hazel::Renderer::Submit(m_TextureShader, m_TextureVA, glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f)) * rotate);
+		m_DuckTexture->Bind();
+		Hazel::Renderer::Submit(m_ShaderLibrary.Get("Texture"), m_TextureVA);
+		m_ThinkTexture->Bind();
+		Hazel::Renderer::Submit(m_ShaderLibrary.Get("Texture"), m_TextureVA);
 
 		Hazel::Renderer::EndScene();
 	}
@@ -133,28 +126,25 @@ public:
 		ImGui::End();
 	}
 
-	void OnEvent(Hazel::Event& event) override
+	void OnEvent(Hazel::Event& e) override
 	{
+		m_CameraController.OnEvent(e);
 		//Hazel::EventDispatcher dispatcher(event);
 		//dispatcher.Dispatch<Hazel::KeyReleasedEvent>(HZ_BIND_EVENT_FN(ExampleLayer::OnKeyReleasedEvent));
 	}
 
 private:
-	Hazel::Ref<Hazel::Shader> m_TextureShader;
-	Hazel::Ref<Hazel::VertexArray> m_TextureVA;
+	Hazel::ShaderLibrary m_ShaderLibrary;
 
-	Hazel::Ref<Hazel::Shader> m_FlatColorShader;
+	Hazel::Ref<Hazel::VertexArray> m_TextureVA;
 	Hazel::Ref<Hazel::VertexArray> m_SquareVA;
 
-	Hazel::Ref<Hazel::Texture2D> m_Texture;
+	Hazel::Ref<Hazel::Texture2D> m_ThinkTexture, m_DuckTexture;
 
 	glm::vec3 m_Color1 = { 0.2f, 0.3f, 0.8f };
 	glm::vec3 m_Color2 = { 0.8f, 0.1f, 0.2f };
 
-	Hazel::OrthographicCamera m_Camera;
-
-	float rotation = 0.0f;
-	float x = 0.0f, y = 0.0f;
+	Hazel::OrthographicCameraController m_CameraController;
 };
 
 class Sandbox : public Hazel::Application

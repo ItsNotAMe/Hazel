@@ -36,7 +36,7 @@ namespace Hazel {
 		uint32_t Offset;
 		bool Normalized;
 
-		BufferElement() {}
+		//BufferElement() {}
 
 		BufferElement(ShaderDataType type, const std::string& name, bool normalized = 0)
 			: Name(name), Type(type), Size(ShaderDataTypeSize(type)), Offset(0), Normalized(normalized)
@@ -59,6 +59,9 @@ namespace Hazel {
 				case ShaderDataType::Int4:			return 4;
 				case ShaderDataType::Bool:			return 1;
 			}
+
+			HZ_CORE_ASSERT(false, "Unknown shader data type!");
+			return 0;
 		}
 	};
 
