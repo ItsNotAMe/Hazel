@@ -12,46 +12,59 @@ Sandbox2D::Sandbox2D()
 
 void Sandbox2D::OnAttach()
 {
+	HZ_PROFILE_FUNCTION();
+
 	m_Texture = Hazel::Texture2D::Create("assets/textures/thinking_smol.png");
 }
 
 void Sandbox2D::OnDetach()
 {
+	HZ_PROFILE_FUNCTION();
 }
 
 void Sandbox2D::OnUpdate(Hazel::Timestep ts)
 {
+	HZ_PROFILE_FUNCTION();
+
 	// Update
 	m_CameraController.OnUpdate(ts);
 
 	// Render
-	Hazel::RenderCommand::SetClearColor({ 0.15f, 0.15f, 0.15f, 1.0f });
-	Hazel::RenderCommand::Clear();
-
-	Hazel::Renderer2D::BeginScene(m_CameraController.GetCamera());
-
-	for (int y = 0; y < m_SquaresPerLine; y++) {
-		for (int x = 0; x < m_SquaresPerLine; x++) {
-			float sizeF = 0.2f;
-			float padding = 0.01f;
-			float num = sizeF + padding;
-			glm::vec3 pos(x * num - num * (m_SquaresPerLine - 1) / 2.0f, y * num - num * (m_SquaresPerLine - 1) / 2.0f, 0.0f);
-			glm::vec2 size(sizeF, sizeF);
-			if (m_DrawSquares)
-				Hazel::Renderer2D::DrawQuad(pos, size, m_Color, m_Rotation);
-			if (m_DrawTextures)
-				Hazel::Renderer2D::DrawQuad(pos, size, m_Texture, m_ColorTint, m_Rotation, m_TextureRepeatCount);
-		}
+	{
+		HZ_PROFILE_SCOPE("Render Prep");
+		Hazel::RenderCommand::SetClearColor({ 0.15f, 0.15f, 0.15f, 1.0f });
+		Hazel::RenderCommand::Clear();
 	}
 
-	// Middle of screen
-	Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 0.01f, 0.01f }, { 1.0f, 1.0f, 1.0f, 1.0f }, 45);
+	{
+		HZ_PROFILE_SCOPE("Render Draw");
+		Hazel::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
-	Hazel::Renderer2D::EndScene();
+		for (int y = 0; y < m_SquaresPerLine; y++) {
+			for (int x = 0; x < m_SquaresPerLine; x++) {
+				float sizeF = 0.2f;
+				float padding = 0.01f;
+				float num = sizeF + padding;
+				glm::vec3 pos(x * num - num * (m_SquaresPerLine - 1) / 2.0f, y * num - num * (m_SquaresPerLine - 1) / 2.0f, 0.0f);
+				glm::vec2 size(sizeF, sizeF);
+				if (m_DrawSquares)
+					Hazel::Renderer2D::DrawQuad(pos, size, m_Color, m_Rotation);
+				if (m_DrawTextures)
+					Hazel::Renderer2D::DrawQuad(pos, size, m_Texture, m_ColorTint, m_Rotation, m_TextureRepeatCount);
+			}
+		}
+
+		// Middle of screen
+		Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 0.01f, 0.01f }, { 1.0f, 1.0f, 1.0f, 1.0f }, 45);
+
+		Hazel::Renderer2D::EndScene();
+	}
 }
 
 void Sandbox2D::OnImGuiRender()
 {
+	HZ_PROFILE_FUNCTION();
+
 	ImGui::Begin("Settings 2D");
 	if (m_DrawSquares)
 		ImGui::ColorEdit4("Square color: ", glm::value_ptr(m_Color));

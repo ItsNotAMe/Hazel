@@ -21,6 +21,8 @@ namespace Hazel {
 
 	void Renderer2D::Init()
 	{
+		HZ_PROFILE_FUNCTION();
+
 		s_Data = new Renderer2DStorage();
 
 		s_Data->QuadVertexArray = VertexArray::Create();
@@ -54,17 +56,23 @@ namespace Hazel {
 
 	void Renderer2D::Shutdown()
 	{
+		HZ_PROFILE_FUNCTION();
+
 		delete s_Data;
 	}
 
 	void Renderer2D::BeginScene(const OrthographicCamera& camera)
 	{
+		HZ_PROFILE_FUNCTION();
+
 		s_Data->TextureShader->Bind();
 		s_Data->TextureShader->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
 	}
 
 	void Renderer2D::EndScene()
 	{
+		HZ_PROFILE_FUNCTION();
+
 
 	}
 
@@ -75,6 +83,8 @@ namespace Hazel {
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, float rotation)
 	{
+		HZ_PROFILE_FUNCTION();
+
 		s_Data->WhiteTexture->Bind();
 
 		s_Data->TextureShader->SetFloat4("u_Color", color);
@@ -102,6 +112,8 @@ namespace Hazel {
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture>& texture, glm::vec4& colorTint, float rotation, float repeatCount)
 	{
+		HZ_PROFILE_FUNCTION();
+
 		texture->Bind();
 
 		s_Data->TextureShader->SetFloat4("u_Color", colorTint);
