@@ -12,12 +12,10 @@ int main(int argc, char** argv)
 	auto app = Hazel::CreateApplication();
 	HZ_PROFILE_END_SESSION();
 
-	HZ_DISABLE_PROFILING();
 	HZ_PROFILE_BEGIN_SESSION("Runtime", "HazelProfile-Runtime.json");
 	app->Run();
 	HZ_PROFILE_END_SESSION();
 
-	HZ_ENABLE_PROFILING();
 	HZ_PROFILE_BEGIN_SESSION("Shutdown", "HazelProfile-Shutdown.json");
 	delete app;
 	HZ_PROFILE_END_SESSION();

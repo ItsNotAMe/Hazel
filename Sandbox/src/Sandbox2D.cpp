@@ -48,14 +48,14 @@ void Sandbox2D::OnUpdate(Hazel::Timestep ts)
 				glm::vec3 pos(x * num - num * (m_SquaresPerLine - 1) / 2.0f, y * num - num * (m_SquaresPerLine - 1) / 2.0f, 0.0f);
 				glm::vec2 size(sizeF, sizeF);
 				if (m_DrawSquares)
-					Hazel::Renderer2D::DrawQuad(pos, size, m_Color, m_Rotation);
+					Hazel::Renderer2D::DrawQuad(pos, size, glm::radians(m_Rotation), m_Color);
 				if (m_DrawTextures)
-					Hazel::Renderer2D::DrawQuad(pos, size, m_Texture, m_ColorTint, m_Rotation, m_TextureRepeatCount);
+					Hazel::Renderer2D::DrawQuad(pos, size, glm::radians(m_Rotation), m_Texture, m_ColorTint, m_TextureRepeatCount);
 			}
 		}
 
 		// Middle of screen
-		Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 0.01f, 0.01f }, { 1.0f, 1.0f, 1.0f, 1.0f }, 45);
+		Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 0.01f, 0.01f }, glm::radians(45.0f), { 1.0f, 1.0f, 1.0f, 1.0f });
 
 		Hazel::Renderer2D::EndScene();
 	}

@@ -96,28 +96,4 @@ namespace Hazel {
 		}
 	}
 
-	// temp
-	void ImGuiLayer::OnImGuiRender()
-	{
-		static bool enabled = false;
-		ImGui::Begin("Hazel settings");
-		bool clicked = ImGui::Button(enabled ? "Disable profiling" : "Enable profiling", { 50, 20 });
-		ImGui::End();
-
-		if (clicked)
-		{
-			if (enabled)
-			{
-				HZ_PROFILE_END_SESSION();
-				HZ_DISABLE_PROFILING();
-			}
-			else
-			{
-				HZ_ENABLE_PROFILING();
-				HZ_PROFILE_BEGIN_SESSION("Runtime", "HazelProfile-Runtime.json");
-			}
-			enabled = !enabled;
-		}
-	}
-
 }

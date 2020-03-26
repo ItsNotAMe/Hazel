@@ -31,7 +31,6 @@ namespace Hazel {
 		std::mutex m_Mutex;
 		InstrumentationSession* m_CurrentSession;
 		std::ofstream m_OutputStream;
-		bool m_ProfilingEnabled = true;
 	public:
 		Instrumentor()
 			: m_CurrentSession(nullptr)
@@ -40,9 +39,6 @@ namespace Hazel {
 
 		void BeginSession(const std::string& name, const std::string& filepath = "results.json")
 		{
-			if (!m_ProfilingEnabled)
-				return;
-
 			std::lock_guard lock(m_Mutex);
 			if (m_CurrentSession) {
 				// If there is already a current session, then close it before beginning new one.
@@ -69,18 +65,12 @@ namespace Hazel {
 
 		void EndSession()
 		{
-			if (!m_ProfilingEnabled)
-				return;
-
 			std::lock_guard lock(m_Mutex);
 			InternalEndSession();
 		}
 
 		void WriteProfile(const ProfileResult& result)
 		{
-			if (!m_ProfilingEnabled)
-				return;
-
 			std::stringstream json;
 
 			std::string name = result.Name;
@@ -102,16 +92,6 @@ namespace Hazel {
 				m_OutputStream << json.str();
 				m_OutputStream.flush();
 			}
-		}
-
-		void EnableProfiling(bool enable)
-		{
-			m_ProfilingEnabled = enable;
-		}
-
-		bool IsEnabled()
-		{
-			return m_ProfilingEnabled;
 		}
 
 		static Instrumentor& Get() 
@@ -172,7 +152,6 @@ namespace Hazel {
 
 			m_Stopped = true;
 		}
-
 	private:
 		const char* m_Name;
 		std::chrono::time_point<std::chrono::steady_clock> m_StartTimepoint;
@@ -180,7 +159,7 @@ namespace Hazel {
 	};
 }
 
-#define HZ_PROFILE 1
+#define HZ_PROFILE 0
 #if HZ_PROFILE
 	// Resolve which function signature macro will be used. Note that this only
 	// is resolved when the (pre)compiler starts, so the syntax highlighting
@@ -204,15 +183,11 @@ namespace Hazel {
 	#endif
 	//#define HZ_FUNC_SIG __FUNCSIG__
 
-	#define HZ_ENABLE_PROFILING() ::Hazel::Instrumentor::Get().EnableProfiling(true)
-	#define HZ_DISABLE_PROFILING() ::Hazel::Instrumentor::Get().EnableProfiling(false)
 	#define HZ_PROFILE_BEGIN_SESSION(name, filepath) ::Hazel::Instrumentor::Get().BeginSession(name, filepath)
 	#define HZ_PROFILE_END_SESSION() ::Hazel::Instrumentor::Get().EndSession()
-	#define HZ_PROFILE_SCOPE(name) ::Hazel::InstrumentationTimer timer##__LINE__(name)
+	#define HZ_PROFILE_SCOPE(name) ::Hazel::InstrumentationTimer timer##__LINE__(name);
 	#define HZ_PROFILE_FUNCTION() HZ_PROFILE_SCOPE(HZ_FUNC_SIG)
 #else
-	#define HZ_ENABLE_PROFILING()
-	#define HZ_DISABLE_PROFILING()
 	#define HZ_PROFILE_BEGIN_SESSION(name, filepath)
 	#define HZ_PROFILE_END_SESSION()
 	#define HZ_PROFILE_SCOPE(name)

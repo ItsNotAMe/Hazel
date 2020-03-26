@@ -216,6 +216,13 @@ namespace Hazel {
 		UploadUniformInt(name, value);
 	}
 
+	void OpenGLShader::SetIntArray(const std::string& name, int value[], uint32_t size)
+	{
+		HZ_PROFILE_FUNCTION();
+
+		UploadUniformIntArray(name, value, size);
+	}
+
 	void OpenGLShader::SetFloat(const std::string& name, float value)
 	{
 		HZ_PROFILE_FUNCTION();
@@ -255,6 +262,12 @@ namespace Hazel {
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniform1i(location, value);
+	}
+
+	void OpenGLShader::UploadUniformIntArray(const std::string& name, int value[], uint32_t size)
+	{
+		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		glUniform1iv(location, size, value);
 	}
 
 	void OpenGLShader::UploadUniformFloat(const std::string& name, float value)
