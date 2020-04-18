@@ -34,11 +34,8 @@ in float v_TexIndex;
 in float v_TilingFactor;
 
 uniform sampler2D u_Textures[32];
-//uniform float u_RepeatCount;
 
 void main()
 {
-	int index = int(v_TexIndex);
-	color = texture(u_Textures[index], v_TexCoord * v_TilingFactor) * v_Color;
-	//color = v_Color;
+	color = texture(u_Textures[int(v_TexIndex)], v_TexCoord * v_TilingFactor) * v_Color;
 }

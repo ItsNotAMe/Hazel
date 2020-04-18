@@ -13,7 +13,7 @@ namespace Hazel {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		// temp
-		// glEnable(GL_DEPTH_TEST);
+		glEnable(GL_DEPTH_TEST);
 	}
 
 	void OpenGLRendererAPI::SetClearColor(const glm::vec4& color)
