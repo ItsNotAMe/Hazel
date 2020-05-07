@@ -133,8 +133,8 @@ namespace Hazel {
 	{
 		HZ_PROFILE_FUNCTION();
 
-		uint32_t size = (uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase;
-		s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, size);
+		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase);
+		s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 
 		Flush();
 	}
@@ -177,7 +177,7 @@ namespace Hazel {
 
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position);
 		if (rotation != 0.0f)
-			transform *= glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1));
+			transform *= glm::rotate(glm::mat4(1.0f), rotation, glm::vec3(0, 0, 1));
 		transform *= glm::inverse(glm::translate(glm::mat4(1.0f), position));
 
 		/*glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
@@ -233,22 +233,12 @@ namespace Hazel {
 		RenderCommand::DrawIndexed(s_Data.QuadVertexArray);*/
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture>& texture, float repeatCount)
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture>& texture, float repeatCount, const glm::vec4& tintColor)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, rotation, texture, glm::vec4(1.0f), repeatCount);
+		DrawQuad({ position.x, position.y, 0.0f }, size, rotation, texture, repeatCount, tintColor);
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture>& texture, float repeatCount)
-	{
-		DrawQuad(position, size, rotation, texture, glm::vec4(1.0f), repeatCount);
-	}
-
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture>& texture, glm::vec4& tintColor, float repeatCount)
-	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, rotation, texture, tintColor, repeatCount);
-	}
-
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture>& texture, glm::vec4& tintColor, float repeatCount)
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture>& texture, float repeatCount, const glm::vec4& tintColor)
 	{
 		HZ_PROFILE_FUNCTION();
 
@@ -274,7 +264,7 @@ namespace Hazel {
 
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position);
 		if (rotation != 0.0f)
-			transform *= glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0, 0, 1));
+			transform *= glm::rotate(glm::mat4(1.0f), rotation, glm::vec3(0, 0, 1));
 		transform *= glm::inverse(glm::translate(glm::mat4(1.0f), position));
 
 		s_Data.QuadVertexBufferPtr->Position = transform * glm::vec4(position.x - size.x / 2, position.y - size.y / 2, position.z, 1.0f);
@@ -317,6 +307,88 @@ namespace Hazel {
 		if (rotation != 0.0f)
 			transform *= glm::rotate(glm::mat4(1.0f), rotation, glm::vec3(0, 0, 1));
 		transform *= glm::scale(glm::mat4(1.0f), glm::vec3(size.x, size.y, 1.0f)); 
+		s_Data.TextureShader->SetMat4("u_Transform", transform);
+
+		s_Data.QuadVertexArray->Bind();
+		RenderCommand::DrawIndexed(s_Data.QuadVertexArray);*/
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<SubTexture2D>& subTexture, float repeatCount, const glm::vec4& tintColor)
+	{
+		DrawQuad({ position.x, position.y, 0.0f }, size, rotation, subTexture, repeatCount, tintColor);
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<SubTexture2D>& subTexture, float repeatCount, const glm::vec4& tintColor)
+	{
+		HZ_PROFILE_FUNCTION();
+
+		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices || s_Data.TextureSlotIndex > Renderer2DData::MaxTextures - 1)
+			FlushAndReset();
+
+		const glm::vec2* texCoords = subTexture->GetTextCoords();
+
+		float textureId = 0.0f;
+		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
+		{
+			if (*s_Data.TextureSlots[i].get() == *subTexture->GetTexture().get())
+			{
+				textureId = (float)i;
+				break;
+			}
+		}
+
+		if (textureId == 0.0f)
+		{
+			textureId = (float)s_Data.TextureSlotIndex;
+			s_Data.TextureSlots[s_Data.TextureSlotIndex] = subTexture->GetTexture();
+			s_Data.TextureSlotIndex++;
+		}
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position);
+		if (rotation != 0.0f)
+			transform *= glm::rotate(glm::mat4(1.0f), rotation, glm::vec3(0, 0, 1));
+		transform *= glm::inverse(glm::translate(glm::mat4(1.0f), position));
+
+		s_Data.QuadVertexBufferPtr->Position = transform * glm::vec4(position.x - size.x / 2, position.y - size.y / 2, position.z, 1.0f);
+		s_Data.QuadVertexBufferPtr->Color = tintColor;
+		s_Data.QuadVertexBufferPtr->TexCoord = texCoords[0];
+		s_Data.QuadVertexBufferPtr->TexId = textureId;
+		s_Data.QuadVertexBufferPtr->TilingFactor = repeatCount;
+		s_Data.QuadVertexBufferPtr++;
+
+		s_Data.QuadVertexBufferPtr->Position = transform * glm::vec4(position.x + size.x / 2, position.y - size.y / 2, position.z, 1.0f);
+		s_Data.QuadVertexBufferPtr->Color = tintColor;
+		s_Data.QuadVertexBufferPtr->TexCoord = texCoords[1];
+		s_Data.QuadVertexBufferPtr->TexId = textureId;
+		s_Data.QuadVertexBufferPtr->TilingFactor = repeatCount;
+		s_Data.QuadVertexBufferPtr++;
+
+		s_Data.QuadVertexBufferPtr->Position = transform * glm::vec4(position.x + size.x / 2, position.y + size.y / 2, position.z, 1.0f);
+		s_Data.QuadVertexBufferPtr->Color = tintColor;
+		s_Data.QuadVertexBufferPtr->TexCoord = texCoords[2];
+		s_Data.QuadVertexBufferPtr->TexId = textureId;
+		s_Data.QuadVertexBufferPtr->TilingFactor = repeatCount;
+		s_Data.QuadVertexBufferPtr++;
+
+		s_Data.QuadVertexBufferPtr->Position = transform * glm::vec4(position.x - size.x / 2, position.y + size.y / 2, position.z, 1.0f);
+		s_Data.QuadVertexBufferPtr->Color = tintColor;
+		s_Data.QuadVertexBufferPtr->TexCoord = texCoords[3];
+		s_Data.QuadVertexBufferPtr->TexId = textureId;
+		s_Data.QuadVertexBufferPtr->TilingFactor = repeatCount;
+		s_Data.QuadVertexBufferPtr++;
+
+		s_Data.QuadIndexCount += 6;
+
+		s_Data.Stats.QuadCount++;
+
+		/*texture->Bind();
+
+		s_Data.TextureShader->SetFloat4("u_Color", tintColor);
+		s_Data.TextureShader->SetFloat("u_RepeatCount", repeatCount);
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position);
+		if (rotation != 0.0f)
+			transform *= glm::rotate(glm::mat4(1.0f), rotation, glm::vec3(0, 0, 1));
+		transform *= glm::scale(glm::mat4(1.0f), glm::vec3(size.x, size.y, 1.0f));
 		s_Data.TextureShader->SetMat4("u_Transform", transform);
 
 		s_Data.QuadVertexArray->Bind();

@@ -17,7 +17,9 @@ public:
 private:
 	Hazel::OrthographicCameraController m_CameraController;
 
-	Hazel::Ref<Hazel::Texture2D> m_Texture;
+	Hazel::Ref<Hazel::Texture2D> m_HmmTexture;
+	Hazel::Ref<Hazel::Texture2D> m_SpriteSheet;
+	Hazel::Ref<Hazel::SubTexture2D> m_RoofTexture, m_EntranceTexture;
 
 	glm::vec3 m_StartColor = { 0.2f, 0.3f, 0.8f };
 	glm::vec3 m_EndColor = { 0.2f, 0.3f, 0.8f };

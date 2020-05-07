@@ -14,7 +14,10 @@ void Sandbox2D::OnAttach()
 {
 	HZ_PROFILE_FUNCTION();
 
-	m_Texture = Hazel::Texture2D::Create("assets/textures/thinking_smol.png");
+	m_HmmTexture = Hazel::Texture2D::Create("assets/textures/thinking_smol.png");
+	m_SpriteSheet = Hazel::Texture2D::Create("assets/game/textures/RPGpack_sheet.png");
+	m_RoofTexture = Hazel::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 0, 4 }, { 128, 128 }, { 2, 3 });
+	m_EntranceTexture = Hazel::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 7, 9 }, { 128, 128 }, { 2, 1 });
 }
 
 void Sandbox2D::OnDetach()
@@ -41,7 +44,7 @@ void Sandbox2D::OnUpdate(Hazel::Timestep ts)
 		HZ_PROFILE_SCOPE("Render Draw");
 		Hazel::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
-		Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 30.0f, 30.0f }, m_Rotation, m_Texture, m_ColorTint, m_TextureRepeatCount);
+		Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 30.0f, 30.0f }, glm::radians(m_Rotation), m_HmmTexture, m_TextureRepeatCount, m_ColorTint);
 
 		for (int y = 0; y < m_SquaresPerLine; y++) {
 			for (int x = 0; x < m_SquaresPerLine; x++) {
@@ -58,14 +61,17 @@ void Sandbox2D::OnUpdate(Hazel::Timestep ts)
 				else
 					color = glm::vec4(m_StartColor.r, m_StartColor.g, m_StartColor.b, m_Alpha);
 				if (m_DrawSquares)
-					Hazel::Renderer2D::DrawQuad(pos, size, m_Rotation, color);
+					Hazel::Renderer2D::DrawQuad(pos, size, glm::radians(m_Rotation), color);
 				if (m_DrawTextures)
-					Hazel::Renderer2D::DrawQuad(glm::vec3(pos, 1.0f), size, m_Rotation, m_Texture, m_ColorTint, m_TextureRepeatCount);
+					Hazel::Renderer2D::DrawQuad(glm::vec3(pos, 0.5f), size, glm::radians(m_Rotation), m_HmmTexture, m_TextureRepeatCount, m_ColorTint);
 			}
 		}
 
+		Hazel::Renderer2D::DrawQuad({ 0.0f, 1.99f, 0.6f }, { 2.0f, 3.0f }, glm::radians(m_Rotation), m_RoofTexture);
+		Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.7f }, { 2.0f, 1.0f }, glm::radians(m_Rotation), m_EntranceTexture);
+
 		// Middle of screen
-		Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 0.01f, 0.01f }, glm::radians(45.0f), { 1.0f, 1.0f, 1.0f, 1.0f });
+		Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f, 1.0f }, { 0.01f, 0.01f }, glm::radians(45.0f), { 1.0f, 1.0f, 1.0f, 1.0f });
 
 		Hazel::Renderer2D::EndScene();
 	}
