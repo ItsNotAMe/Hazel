@@ -28,10 +28,12 @@ namespace Hazel {
 		const OrthographicCamera& GetCamera() const { return m_Camera; }
 
 		//float GetZoomLevel() const { return m_ZoomLevel; }
-		//void SetZoomLevel(float level) { m_ZoomLevel = level; m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel); }
+		void SetZoomLevel(float level) { m_ZoomLevel = level; CalculateView(); }
 
 		const OrthographicCameraBounds& GetBounds() { return m_Bounds; }
 	private:
+		void CalculateView();
+
 		bool OnMouseScrolled(MouseScrolledEvent& e);
 		bool OnWindowResized(WindowResizeEvent& e);
 	private:

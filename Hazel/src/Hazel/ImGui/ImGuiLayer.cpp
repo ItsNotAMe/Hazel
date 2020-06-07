@@ -1,5 +1,5 @@
 #include "hzpch.h"
-#include "ImGuiLayer.h"
+#include "Hazel/ImGui/ImGuiLayer.h"
 
 #include <imgui.h>
 #include <examples/imgui_impl_glfw.h>
@@ -8,19 +8,14 @@
 #include "Hazel/Core/Application.h"
 
 // TEMPORARY
+#include <GLFW/glfw3.h>
 #include <glad/glad.h>
-#include "GLFW/glfw3.h"
 
 namespace Hazel {
 
 	ImGuiLayer::ImGuiLayer()
 		: Layer("ImGuiLayer")
 	{
-	}
-
-	ImGuiLayer::~ImGuiLayer()
-	{
-
 	}
 
 	void ImGuiLayer::OnAttach()
@@ -50,7 +45,8 @@ namespace Hazel {
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
 
-		GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+		Application& app = Application::Get();
+		GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
 
 		// Setup Platform/Renderer bindings
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -66,6 +62,13 @@ namespace Hazel {
 		ImGui::DestroyContext();
 	}
 
+	void ImGuiLayer::OnEvent(Event& e)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		e.Handled |= e.IsInCategory(EventCategory::EventCategoryMouse) & io.WantCaptureMouse;
+		e.Handled |= e.IsInCategory(EventCategory::EventCategoryKeyboard) & io.WantCaptureKeyboard;
+	}
+
 	void ImGuiLayer::Begin()
 	{
 		HZ_PROFILE_FUNCTION();
@@ -73,6 +76,9 @@ namespace Hazel {
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+
+		/*static bool show = true;
+		ImGui::ShowDemoWindow(&show);*/
 	}
 
 	void ImGuiLayer::End()

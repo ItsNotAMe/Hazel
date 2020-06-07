@@ -24,6 +24,7 @@ private:
 	glm::vec3 m_StartColor = { 0.2f, 0.3f, 0.8f };
 	glm::vec3 m_EndColor = { 0.2f, 0.3f, 0.8f };
 	glm::vec4 m_ColorTint = { 1.0f,  1.0f,  1.0f, 1.0f };
+	float m_PositionZ = 0.7f;
 	float m_Alpha = 0.7f;
 	float m_Rotation = 0.0f;
 	int m_SquaresPerLine = 3;
