@@ -25,6 +25,8 @@ namespace Hazel {
 		Ref<Texture2D> m_SpriteSheet;
 		Ref<SubTexture2D> m_RoofTexture, m_EntranceTexture;
 
+		glm::vec2 m_ViewportSize;
+
 		glm::vec3 m_StartColor = { 0.2f, 0.3f, 0.8f };
 		glm::vec3 m_EndColor = { 0.2f, 0.3f, 0.8f };
 		glm::vec4 m_ColorTint = { 1.0f,  1.0f,  1.0f, 1.0f };
