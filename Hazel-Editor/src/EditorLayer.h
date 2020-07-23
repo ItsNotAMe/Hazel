@@ -26,7 +26,7 @@ namespace Hazel {
 		Ref<SubTexture2D> m_RoofTexture, m_EntranceTexture;
 
 		Ref<Scene> m_ActiveScene;
-		entt::entity m_SquareEntity;
+		Entity m_SquareEntity;
 
 		bool m_ViewportFocused = false, m_ViewportHovered = false;
 		glm::vec2 m_ViewportSize;

@@ -25,9 +25,9 @@ namespace Hazel {
 		m_Framebuffer = Framebuffer::Create(frameBufferSpec);
 
 		m_ActiveScene = CreateRef<Scene>();
-		m_SquareEntity = m_ActiveScene->CreateEntity();
-		m_ActiveScene->Reg().emplace<TransformComponent>(m_SquareEntity);
-		m_ActiveScene->Reg().emplace<SpriteRendererComponent>(m_SquareEntity, glm::vec4{ 0.2f, 0.3f, 0.8f, 1.0f }).Color;
+		m_SquareEntity = m_ActiveScene->CreateEntity("Square");
+		m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.2f, 0.3f, 0.8f, 1.0f });
+		//m_SquareEntity.GetComponent<TransformComponent>().Transform += glm::translate(glm::mat4(1.0f), glm::vec3(1, 1, 0));
 	}
 
 	void EditorLayer::OnDetach()
@@ -127,8 +127,10 @@ namespace Hazel {
 		}
 
 		ImGui::Begin("Settings 2D");
-		auto& squareColor = m_ActiveScene->Reg().get<SpriteRendererComponent>(m_SquareEntity).Color;
-		ImGui::ColorEdit4("Square color: ", glm::value_ptr(squareColor));
+		if (m_SquareEntity) {
+			auto& squareColor = m_SquareEntity.GetComponent<SpriteRendererComponent>().Color;
+			ImGui::ColorEdit4("Square color: ", glm::value_ptr(squareColor));
+		}
 
 		auto stats = Renderer2D::GetStats();
 		ImGui::Text("Renderer2D stats:");
