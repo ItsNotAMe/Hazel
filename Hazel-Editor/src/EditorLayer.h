@@ -32,7 +32,7 @@ namespace Hazel {
 		bool m_PrimaryCamera = true;
 
 		bool m_ViewportFocused = false, m_ViewportHovered = false;
-		glm::vec2 m_ViewportSize;
+		glm::vec2 m_ViewportSize{ 0, 0 };
 	};
 
 }

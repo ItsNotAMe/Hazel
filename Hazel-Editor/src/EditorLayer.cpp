@@ -30,11 +30,11 @@ namespace Hazel {
 		//m_SquareEntity.GetComponent<TransformComponent>().Transform += glm::translate(glm::mat4(1.0f), glm::vec3(1, 1, 0));
 
 		m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
-		auto& cc = m_CameraEntity.AddComponent<CameraComponent>(glm::ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f));
+		auto& cc = m_CameraEntity.AddComponent<CameraComponent>();
 		cc.Primary = true;
 
 		m_SecondCamera = m_ActiveScene->CreateEntity("Clip-Space Camera");
-		m_SecondCamera.AddComponent<CameraComponent>(glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f));
+		m_SecondCamera.AddComponent<CameraComponent>();
 	}
 
 	void EditorLayer::OnDetach()
@@ -53,6 +53,8 @@ namespace Hazel {
 		{
 			m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 			m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+
+			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		}
 
 		// Update
@@ -137,9 +139,12 @@ namespace Hazel {
 			ImGui::ColorEdit4("Square color", glm::value_ptr(squareColor));
 		}
 
+		ImGui::Separator();
 		if (m_CameraEntity) {
-			ImGui::Text(m_CameraEntity.GetComponent<TagComponent>().Tag.c_str());
-			ImGui::DragFloat3("Camera Transform", 
+			std::string title = m_CameraEntity.GetComponent<TagComponent>().Tag + " settings";
+			ImGui::TextColored({ 0.3f, 0.4f, 0.9f, 1.0f }, title.c_str());
+			ImGui::Text("Camera transform");
+			ImGui::DragFloat3(" ", 
 				glm::value_ptr(m_CameraEntity.GetComponent<TransformComponent>().Transform[3]));
 		}
 
@@ -147,6 +152,14 @@ namespace Hazel {
 		{
 			m_CameraEntity.GetComponent<CameraComponent>().Primary = m_PrimaryCamera;
 			m_SecondCamera.GetComponent<CameraComponent>().Primary = !m_PrimaryCamera;
+		}
+
+		{
+			auto& camera = m_SecondCamera.GetComponent<CameraComponent>().Camera;
+			float orthoSize = camera.GetOrthographicSize();
+			ImGui::Text("Second camera ortho size");
+			if (ImGui::DragFloat(" ", &orthoSize))
+				camera.SetOrthographicSize(orthoSize);
 		}
 		ImGui::Separator();
 
