@@ -30,11 +30,44 @@ namespace Hazel {
 		//m_SquareEntity.GetComponent<TransformComponent>().Transform += glm::translate(glm::mat4(1.0f), glm::vec3(1, 1, 0));
 
 		m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
-		auto& cc = m_CameraEntity.AddComponent<CameraComponent>();
-		cc.Primary = true;
+		m_CameraEntity.AddComponent<CameraComponent>();
 
 		m_SecondCamera = m_ActiveScene->CreateEntity("Clip-Space Camera");
-		m_SecondCamera.AddComponent<CameraComponent>();
+		auto& cc = m_SecondCamera.AddComponent<CameraComponent>();
+		cc.Primary = false;
+
+		class CameraController : public ScriptableEntity
+		{
+		public:
+			void OnCreate()
+			{
+
+			}
+
+			void OnDestroy()
+			{
+
+			}
+
+			void OnUpdate(Timestep ts)
+			{
+				if (!GetComponent<CameraComponent>().Primary)
+					return;
+				auto& transform = GetComponent<TransformComponent>().Transform;
+				float speed = GetComponent<CameraComponent>().Camera.GetOrthographicSize() / 2;
+
+				if (Input::IsKeyPressed(KeyCode::W))
+					transform[3][1] += speed * ts;
+				if (Input::IsKeyPressed(KeyCode::S))
+					transform[3][1] -= speed * ts;
+				if (Input::IsKeyPressed(KeyCode::D))
+					transform[3][0] += speed * ts;
+				if (Input::IsKeyPressed(KeyCode::A))
+					transform[3][0] -= speed * ts;
+			}
+		};
+		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+		m_SecondCamera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 	}
 
 	void EditorLayer::OnDetach()
