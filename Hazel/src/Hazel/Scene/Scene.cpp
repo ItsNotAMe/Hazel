@@ -31,17 +31,14 @@ namespace Hazel {
 		{
 			m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
 			{
-					if (!nsc.Instance->m_Entity)
+					if (!nsc.Instance/*->m_Entity*/)
 					{
-						//nsc.InstantiateFunction();
+						nsc.Instance = nsc.InstantiateScript();
 						nsc.Instance->m_Entity = Entity{ entity, this };
-
-						if (nsc.OnCreateFunction)
-							nsc.OnCreateFunction(nsc.Instance);
+						nsc.Instance->OnCreate();
 					}
 
-					if (nsc.OnUpdateFunction)
-						nsc.OnUpdateFunction(nsc.Instance, ts);
+					nsc.Instance->OnUpdate(ts);
 			});
 		}
 
@@ -52,7 +49,7 @@ namespace Hazel {
 			auto group = m_Registry.group<CameraComponent>(entt::get<TransformComponent>);
 			for (auto entity : group)
 			{
-				auto& [camera, transform] = group.get<CameraComponent, TransformComponent>(entity);
+				auto [camera, transform] = group.get<CameraComponent, TransformComponent>(entity);
 
 				if (camera.Primary)
 				{
@@ -67,10 +64,10 @@ namespace Hazel {
 		{
 			Renderer2D::BeginScene(*mainCamera, *cameraTransform);
 
-			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+			auto group = m_Registry.group<SpriteRendererComponent>(entt::get<TransformComponent>);
 			for (auto entity : group)
 			{
-				auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+				auto [sprite, transform] = group.get<SpriteRendererComponent, TransformComponent>(entity);
 
 				Renderer2D::DrawQuad(transform, sprite.Color);
 			}
