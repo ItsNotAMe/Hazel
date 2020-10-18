@@ -20,7 +20,7 @@ namespace Hazel {
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
 	};
 
-	enum class EventCategory
+	enum EventCategory
 	{
 		None = 0,
 		EventCategoryApplication	 = BIT(0),
@@ -29,8 +29,6 @@ namespace Hazel {
 		EventCategoryMouse			 = BIT(3),
 		EventCategoryMouseButton	 = BIT(4)
 	};
-
-#define TOINT (int)EventCategory
 
 #define EVENT_CLASS_TYPE(type) static EventType GetStaticType() { return EventType::type; }\
 								virtual EventType GetEventType() const override { return GetStaticType(); }\
@@ -67,12 +65,13 @@ namespace Hazel {
 		{
 		}
 
-		template<typename T>
-		bool Dispatch(EventFn<T> func)
+		// F will be deduced by the compiler
+		template<typename T, typename F>
+		bool Dispatch(const F& func)
 		{
 			if (m_Event.GetEventType() == T::GetStaticType())
 			{
-				m_Event.Handled = func(*(T*)& m_Event);
+				m_Event.Handled |= func(static_cast<T&>(m_Event));
 				return true;
 			}
 			return false;

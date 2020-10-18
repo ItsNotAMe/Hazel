@@ -25,16 +25,19 @@ namespace Hazel {
 		m_Framebuffer = Framebuffer::Create(frameBufferSpec);
 
 		m_ActiveScene = CreateRef<Scene>();
-		m_SquareEntity = m_ActiveScene->CreateEntity("Square");
-		m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.2f, 0.3f, 0.8f, 1.0f });
-		//m_SquareEntity.GetComponent<TransformComponent>().Transform += glm::translate(glm::mat4(1.0f), glm::vec3(1, 1, 0));
 
-		m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
+		Entity m_CameraEntity = m_ActiveScene->CreateEntity("Camera A");
 		m_CameraEntity.AddComponent<CameraComponent>();
 
-		m_SecondCamera = m_ActiveScene->CreateEntity("Clip-Space Camera");
+		Entity m_SecondCamera = m_ActiveScene->CreateEntity("Camera B");
 		auto& cc = m_SecondCamera.AddComponent<CameraComponent>();
 		cc.Primary = false;
+
+		Entity m_SquareEntity = m_ActiveScene->CreateEntity("Square");
+		m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.2f, 0.3f, 0.8f, 1.0f });
+
+		Entity m_SquareEntity2 = m_ActiveScene->CreateEntity("Square2");
+		m_SquareEntity2.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.8f, 0.2f, 0.3f, 1.0f });
 
 		class CameraController : public ScriptableEntity
 		{
@@ -56,13 +59,13 @@ namespace Hazel {
 				auto& transform = GetComponent<TransformComponent>().Transform;
 				float speed = GetComponent<CameraComponent>().Camera.GetOrthographicSize() / 2;
 
-				if (Input::IsKeyPressed(KeyCode::W))
+				if (Input::IsKeyPressed(Key::W))
 					transform[3][1] += speed * ts;
-				if (Input::IsKeyPressed(KeyCode::S))
+				if (Input::IsKeyPressed(Key::S))
 					transform[3][1] -= speed * ts;
-				if (Input::IsKeyPressed(KeyCode::D))
+				if (Input::IsKeyPressed(Key::D))
 					transform[3][0] += speed * ts;
-				if (Input::IsKeyPressed(KeyCode::A))
+				if (Input::IsKeyPressed(Key::A))
 					transform[3][0] -= speed * ts;
 			}
 		};
@@ -169,36 +172,7 @@ namespace Hazel {
 
 		m_SceneHierarchyPanel.OnImGuiRender();
 
-		ImGui::Begin("Settings 2D");
-		if (m_SquareEntity) {
-			ImGui::Text(m_SquareEntity.GetComponent<TagComponent>().Tag.c_str());
-			auto& squareColor = m_SquareEntity.GetComponent<SpriteRendererComponent>().Color;
-			ImGui::ColorEdit4("Square color", glm::value_ptr(squareColor));
-		}
-
-		ImGui::Separator();
-		if (m_CameraEntity) {
-			std::string title = m_CameraEntity.GetComponent<TagComponent>().Tag + " settings";
-			ImGui::TextColored({ 0.3f, 0.4f, 0.9f, 1.0f }, title.c_str());
-			ImGui::Text("Camera transform");
-			ImGui::DragFloat3(" ", 
-				glm::value_ptr(m_CameraEntity.GetComponent<TransformComponent>().Transform[3]));
-		}
-
-		if (ImGui::Checkbox("Camera 1", &m_PrimaryCamera))
-		{
-			m_CameraEntity.GetComponent<CameraComponent>().Primary = m_PrimaryCamera;
-			m_SecondCamera.GetComponent<CameraComponent>().Primary = !m_PrimaryCamera;
-		}
-
-		{
-			auto& camera = m_SecondCamera.GetComponent<CameraComponent>().Camera;
-			float orthoSize = camera.GetOrthographicSize();
-			ImGui::Text("Second camera ortho size");
-			if (ImGui::DragFloat(" ", &orthoSize))
-				camera.SetOrthographicSize(orthoSize);
-		}
-		ImGui::Separator();
+		ImGui::Begin("Stats");
 
 		auto stats = Renderer2D::GetStats();
 		ImGui::Text("Renderer2D stats:");
