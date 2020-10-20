@@ -56,17 +56,17 @@ namespace Hazel {
 			{
 				if (!GetComponent<CameraComponent>().Primary)
 					return;
-				auto& transform = GetComponent<TransformComponent>().Transform;
+				auto& translation = GetComponent<TransformComponent>().Translation;
 				float speed = GetComponent<CameraComponent>().Camera.GetOrthographicSize() / 2;
 
 				if (Input::IsKeyPressed(Key::W))
-					transform[3][1] += speed * ts;
+					translation.y += speed * ts;
 				if (Input::IsKeyPressed(Key::S))
-					transform[3][1] -= speed * ts;
+					translation.y -= speed * ts;
 				if (Input::IsKeyPressed(Key::D))
-					transform[3][0] += speed * ts;
+					translation.x += speed * ts;
 				if (Input::IsKeyPressed(Key::A))
-					transform[3][0] -= speed * ts;
+					translation.x -= speed * ts;
 			}
 		};
 		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
