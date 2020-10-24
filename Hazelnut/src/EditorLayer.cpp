@@ -5,6 +5,8 @@
 #include <imgui/imgui.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Hazel/Scene/SceneSerializer.h"
+
 namespace Hazel {
 
 	EditorLayer::EditorLayer()
@@ -26,6 +28,7 @@ namespace Hazel {
 
 		m_ActiveScene = CreateRef<Scene>();
 
+#if 0
 		Entity m_CameraEntity = m_ActiveScene->CreateEntity("Camera A");
 		m_CameraEntity.AddComponent<CameraComponent>();
 
@@ -71,13 +74,20 @@ namespace Hazel {
 		};
 		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 		m_SecondCamera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+#endif
 
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
+		SceneSerializer serializer(m_ActiveScene);
+		serializer.Deserialize("assets/scenes/Example.hazel");
 	}
 
 	void EditorLayer::OnDetach()
 	{
 		HZ_PROFILE_FUNCTION();
+
+		/*SceneSerializer serializer(m_ActiveScene);
+		serializer.Serialize("assets/scenes/Example.hazel");*/
 	}
 
 	void EditorLayer::OnUpdate(Timestep ts)
@@ -170,6 +180,19 @@ namespace Hazel {
 			if (ImGui::BeginMenu("File"))
 			{
 				if (ImGui::MenuItem("Exit")) Application::Get().Close();
+				if (ImGui::MenuItem("Serialize"))
+				{
+					SceneSerializer serializer(m_ActiveScene);
+					serializer.Serialize("assets/scenes/MyScene.hazel");
+				}
+				if (ImGui::MenuItem("Deserialize"))
+				{
+					m_ActiveScene = CreateRef<Scene>();
+					m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+					m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+					SceneSerializer serializer(m_ActiveScene);
+					serializer.Deserialize("assets/scenes/MyScene.hazel");
+				}
 				ImGui::EndMenu();
 			}
 
