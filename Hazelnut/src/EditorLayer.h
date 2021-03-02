@@ -20,6 +20,7 @@ namespace Hazel {
 		virtual void OnEvent(Event& e) override;
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);
+		bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
 
 		void NewScene();
 		void OpenScene();
@@ -27,6 +28,8 @@ namespace Hazel {
 	private:
 		// OrthographicCameraController m_CameraController;
 		EditorCamera m_EditorCamera;
+
+		Entity m_HoveredEntity;
 
 		Ref<Framebuffer> m_Framebuffer;
 
