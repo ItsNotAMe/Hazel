@@ -27,8 +27,9 @@ namespace Hazel {
 		m_RoofTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 0, 4 }, { 128, 128 }, { 2, 3 });
 		m_EntranceTexture = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 7, 9 }, { 128, 128 }, { 2, 1 });
 
-		FramebufferSpecification frameBufferSpec = { 1280, 720 };
-		m_Framebuffer = Framebuffer::Create(frameBufferSpec);
+		FramebufferSpecification fbSpec = { 1280, 720 };
+		fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::Depth };
+		m_Framebuffer = Framebuffer::Create(fbSpec);
 
 		m_ActiveScene = CreateRef<Scene>();
 
