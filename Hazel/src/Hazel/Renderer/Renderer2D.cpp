@@ -174,7 +174,7 @@ namespace Hazel {
 
 		s_Data.QuadVertexArray->Bind();
 		RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
-		s_Data.QuadVertexArray->UnBind();
+		s_Data.QuadVertexArray->Unbind();
 
 		s_Data.Stats.DrawCalls++;
 	}
