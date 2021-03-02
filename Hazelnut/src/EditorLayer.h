@@ -25,7 +25,8 @@ namespace Hazel {
 		void OpenScene();
 		void SaveSceneAs();
 	private:
-		OrthographicCameraController m_CameraController;
+		// OrthographicCameraController m_CameraController;
+		EditorCamera m_EditorCamera;
 
 		Ref<Framebuffer> m_Framebuffer;
 
